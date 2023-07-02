@@ -1,0 +1,60 @@
+# global is some global config used by dorisctl
+global:
+  # deploy doris as <deploy_user>, the doris processes will run as <deploy_user>
+  deploy_user: doris
+  # private key path used to connect to remote host
+  # ssh root@<host> -i <ssh_private_key_path> should work
+  ssh_private_key_path: /home/lobshunter.linux/.ssh/id_rsa
+
+# doris fe specifications
+fes:
+  - host: "127.0.0.1"
+    # ssh port used to connect to remote host
+    ssh_port: 22
+    # deploy doris fe to <deploy_dir>
+    # it
+    deploy_dir: /doris/fe
+    # doris fe configs in .ini format, fields below are required
+    # more configs can be added here as needed
+    config: |
+      http_port = 8030
+      rpc_port = 9020
+      query_port = 9030
+      edit_log_port = 9010
+      priority_networks=127.0.0.1/24
+    # doris fe metadata master, only one of fe should be master(set is_master to true)
+    is_master: true
+    # whether to install standalone java under <deploy_dir>/jdk
+    # if true, java_package_url and java_digest are required
+    # if false, JDK must be pre-installed because doris fe depends on JDK
+    install_java: true
+    java_package_url: https://aka.ms/download-jdk/microsoft-jdk-11.0.20-linux-aarch64.tar.gz
+    java_digest: sha256:0aaf48d5bed9fd1bfd2bfaaa33007bee0dabccb8fb791ddd468f9b49839823ad
+    # doris fe package url and digest
+    package_url: https://apache-doris-releases.oss-accelerate.aliyuncs.com/apache-doris-2.0-beta-bin-arm64.tar.gz
+    digest: sha512:6fd78585457e08f36c1cb05b4a9095a5fb41b0a2d7fd3a594bdff2c295ad66ec7ac641eaac7eacf6a1c091f912d448705404b226d5f757bf02c427f5c2d2bf31
+
+# doris be specifications
+bes:
+  - host: "127.0.0.1"
+    ssh_port: 22
+    deploy_dir: /doris/be
+    # doris be configs in .ini format
+    config: |
+      # required fields
+      be_port = 9060
+      webserver_port = 8040
+      heartbeat_service_port = 9050
+      brpc_port = 8060
+      priority_networks=127.0.0.1/24
+      storage_root_path=/doris/be/storage.SSD
+
+      disable_minidump = true
+      path_gc_check_interval_second=1
+      max_garbage_sweep_interval=180
+      enable_storage_vectorization=false
+    install_java: true
+    java_package_url: https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+    java_digest: sha256:99be79935354f5c0df1ad293620ea36d13f48ec3ea870c838f20c504c9668b57
+    package_url: https://apache-doris-releases.oss-accelerate.aliyuncs.com/apache-doris-2.0.0-bin-x64.tar.gz
+    digest: sha512:e5ef0fb5796d19e21b75f5c4e017249172e3f6a93baa27dc1c4d0c4f7138fa8ef8186be66ba60d90468f6ef68687ec6dc09f4ef554beec621fd43f6467fac423

@@ -1,0 +1,13 @@
+[Unit]
+Description={{.SystemdServiceName}} service
+After=network.target
+
+[Service]
+User={{.DeployUser}}
+ExecStart=/bin/bash '{{.StarupScriptPath}}'
+
+Restart=always
+RestartSec=15s
+
+[Install]
+WantedBy=multi-user.target
