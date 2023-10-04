@@ -40,19 +40,6 @@ func NewDownloadPackage(ctx *task.Context) Step {
 }
 
 func NewInitHost(ctx *task.Context) Step {
-	initUniqueHostTasks := make([]task.Task, 0)
-	uniqueHosts := make(map[string]struct{})
-	for _, fe := range ctx.TopoYaml.FEs {
-		uniqueHosts[fe.Host] = struct{}{}
-	}
-	for _, be := range ctx.TopoYaml.BEs {
-		uniqueHosts[be.Host] = struct{}{}
-	}
-	for host := range uniqueHosts {
-		sshClient := ctx.SSHClients[host]
-		initUniqueHostTasks = append(initUniqueHostTasks, remote.NewInitInstanceUniqueHost(sshClient, ctx.TopoYaml.Global.DeployUser))
-	}
-
 	initInstanceHostTasks := make([]task.Task, 0, len(ctx.TopoYaml.FEs)+len(ctx.TopoYaml.BEs))
 	// maybe split into two tasks: component dedicated & component agnositic
 	for _, fe := range ctx.TopoYaml.FEs {
@@ -74,7 +61,6 @@ func NewInitHost(ctx *task.Context) Step {
 	}
 
 	return NewSerial(
-		NewParallel(initUniqueHostTasks...),
 		NewParallel(initInstanceHostTasks...),
 		NewParallel(initBeTasks...),
 	)
