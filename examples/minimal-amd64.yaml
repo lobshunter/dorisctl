@@ -4,7 +4,7 @@ global:
   deploy_user: doris
   # private key path used to connect to remote host
   # ssh root@<host> -i <ssh_private_key_path> should work
-  ssh_private_key_path: /home/lobshunter.linux/.ssh/id_rsa
+  ssh_private_key_path: ~/.ssh/id_rsa
 
 # doris fe specifications
 fes:

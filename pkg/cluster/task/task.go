@@ -33,8 +33,7 @@ func BuildContext(clusterName string, topo topologyyaml.Topology,
 			continue
 		}
 
-		// TODO: configurable user, should use deployUser when doing operations other than deploy
-		sshClient, err := ssh.NewSSHClient(fmt.Sprintf("%s:%d", fe.Host, fe.SSHPort), "root", topo.Global.SSHPrivateKeyPath)
+		sshClient, err := ssh.NewSSHClient(fmt.Sprintf("%s:%d", fe.Host, fe.SSHPort), topo.Global.DeployUser, topo.Global.SSHPrivateKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("create sshclient on %s: %v", fe.Host, err)
 		}
@@ -46,7 +45,7 @@ func BuildContext(clusterName string, topo topologyyaml.Topology,
 			continue
 		}
 
-		sshClient, err := ssh.NewSSHClient(fmt.Sprintf("%s:%d", be.Host, be.SSHPort), "root", topo.Global.SSHPrivateKeyPath)
+		sshClient, err := ssh.NewSSHClient(fmt.Sprintf("%s:%d", be.Host, be.SSHPort), topo.Global.DeployUser, topo.Global.SSHPrivateKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("create sshclient on %s: %v", be.Host, err)
 		}

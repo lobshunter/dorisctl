@@ -1,6 +1,6 @@
 global:
   deploy_user: doris
-  ssh_private_key_path: /home/lobshunter.linux/.ssh/id_rsa
+  ssh_private_key_path: ~/.ssh/id_rsa
 fes:
   - host: "127.0.0.1"
     ssh_port: 22

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -18,6 +19,14 @@ type SSHClient struct {
 }
 
 func NewSSHClient(remoteAddr string, username string, sshKeyFile string) (*SSHClient, error) {
+	if strings.HasPrefix(sshKeyFile, "~") {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		sshKeyFile = strings.Replace(sshKeyFile, "~", homeDir, 1)
+	}
+
 	sshKeyData, err := os.ReadFile(sshKeyFile)
 	if err != nil {
 		return nil, err
