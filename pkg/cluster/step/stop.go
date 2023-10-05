@@ -12,13 +12,13 @@ func NewStopCluster(ctx *task.Context) Step {
 	for _, fe := range ctx.TopoYaml.FEs {
 		sshClient := ctx.SSHClients[fe.Host]
 		feInstance := topologyyaml.NewFeInstance(&ctx.TopoYaml, fe)
-		tasks = append(tasks, remote.NewStopService(sshClient, feInstance.SystemdServiceName()))
+		tasks = append(tasks, remote.NewStopService(sshClient, feInstance, ctx.TopoYaml.UseSystemd()))
 	}
 
 	for _, be := range ctx.TopoYaml.BEs {
 		sshClient := ctx.SSHClients[be.Host]
 		beInstance := topologyyaml.NewBeInstance(&ctx.TopoYaml, be)
-		tasks = append(tasks, remote.NewStopService(sshClient, beInstance.SystemdServiceName()))
+		tasks = append(tasks, remote.NewStopService(sshClient, beInstance, ctx.TopoYaml.UseSystemd()))
 	}
 
 	return NewParallel(tasks...)

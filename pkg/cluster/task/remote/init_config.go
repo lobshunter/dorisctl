@@ -17,16 +17,18 @@ var (
 )
 
 type InitFeConfig struct {
-	sshClient *ssh.SSHClient
-	fe        topologyyaml.FeInstance
-	deployDir string
+	sshClient  *ssh.SSHClient
+	fe         topologyyaml.FeInstance
+	deployDir  string
+	useSystemd bool
 }
 
-func NewInitFeConfig(sshClient *ssh.SSHClient, fe topologyyaml.FeInstance, deployDir string) *InitFeConfig {
+func NewInitFeConfig(sshClient *ssh.SSHClient, fe topologyyaml.FeInstance, deployDir string, useSystemd bool) *InitFeConfig {
 	return &InitFeConfig{
-		sshClient: sshClient,
-		fe:        fe,
-		deployDir: deployDir,
+		sshClient:  sshClient,
+		fe:         fe,
+		deployDir:  deployDir,
+		useSystemd: useSystemd,
 	}
 }
 
@@ -44,13 +46,16 @@ func (t *InitFeConfig) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	systemdUnit, err := t.fe.SystemdServiceContent()
-	if err != nil {
-		return err
-	}
-	err = t.sshClient.WriteFile(bytes.NewBufferString(systemdUnit), t.fe.SystemdServicePath())
-	if err != nil {
-		return err
+
+	if t.useSystemd {
+		systemdUnit, err2 := t.fe.SystemdServiceContent()
+		if err2 != nil {
+			return err2
+		}
+		err2 = t.sshClient.WriteFile(bytes.NewBufferString(systemdUnit), t.fe.SystemdServicePath())
+		if err2 != nil {
+			return err2
+		}
 	}
 
 	err = t.sshClient.Run(ctx, "chown -R "+t.fe.DeployUser+" "+t.fe.DeployDir)
@@ -62,16 +67,18 @@ func (t *InitFeConfig) Execute(ctx context.Context) error {
 }
 
 type InitBeConfig struct {
-	sshClient *ssh.SSHClient
-	be        topologyyaml.BeInstance
-	deployDir string
+	sshClient  *ssh.SSHClient
+	be         topologyyaml.BeInstance
+	deployDir  string
+	useSystemd bool
 }
 
-func NewInitBeConfig(sshClient *ssh.SSHClient, be topologyyaml.BeInstance, deployDir string) *InitBeConfig {
+func NewInitBeConfig(sshClient *ssh.SSHClient, be topologyyaml.BeInstance, deployDir string, useSystemd bool) *InitBeConfig {
 	return &InitBeConfig{
-		sshClient: sshClient,
-		be:        be,
-		deployDir: deployDir,
+		sshClient:  sshClient,
+		be:         be,
+		deployDir:  deployDir,
+		useSystemd: useSystemd,
 	}
 }
 
@@ -90,13 +97,15 @@ func (t *InitBeConfig) Execute(_ context.Context) error {
 		return err
 	}
 
-	systemdUnit, err := t.be.SystemdServiceContent()
-	if err != nil {
-		return err
-	}
-	err = t.sshClient.WriteFile(bytes.NewBufferString(systemdUnit), t.be.SystemdServicePath())
-	if err != nil {
-		return err
+	if t.useSystemd {
+		systemdUnit, err2 := t.be.SystemdServiceContent()
+		if err2 != nil {
+			return err2
+		}
+		err2 = t.sshClient.WriteFile(bytes.NewBufferString(systemdUnit), t.be.SystemdServicePath())
+		if err2 != nil {
+			return err2
+		}
 	}
 
 	err = t.sshClient.Run(context.Background(), "chown -R "+t.be.DeployUser+" "+t.be.DeployDir)

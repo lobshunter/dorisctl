@@ -14,6 +14,22 @@ import (
 	"github.com/lobshunter/dorisctl/pkg/embed"
 )
 
+var (
+	_ Instance = &FeInstance{}
+	_ Instance = &BeInstance{}
+)
+
+type Instance interface {
+	EnvironmentVars() map[string]string
+	PIDFile() string
+	StartupScript() string
+	StopScript() string
+	SystemdEnvironment() string
+	SystemdServiceContent() (string, error)
+	SystemdServicePath() string
+	SystemdServiceName() string
+}
+
 type FeInstance struct {
 	DeployUser string
 	Topo       *Topology
@@ -67,7 +83,11 @@ func (s FeInstance) ConfigDir() string {
 	return filepath.Join(s.DeployDir, "conf")
 }
 
-func (s FeInstance) StarupScript() string {
+func (s FeInstance) PIDFile() string {
+	return filepath.Join(s.DeployDir, "bin", "fe.pid")
+}
+
+func (s FeInstance) StartupScript() string {
 	startupScript := filepath.Join(s.DeployDir, "bin", "start_fe.sh")
 	if !s.IsMaster {
 		startupScript = fmt.Sprintf("%s --helper %s", startupScript, s.MasterHelper())
@@ -76,11 +96,23 @@ func (s FeInstance) StarupScript() string {
 	return startupScript
 }
 
+func (s FeInstance) StopScript() string {
+	return filepath.Join(s.DeployDir, "bin", "stop_fe.sh")
+}
+
+func (s FeInstance) EnvironmentVars() map[string]string {
+	envs := make(map[string]string)
+	if s.InstallJava {
+		envs["JAVA_HOME"] = fmt.Sprintf("%s/jdk", s.DeployDir)
+	}
+
+	return envs
+}
+
 func (s FeInstance) SystemdEnvironment() string {
 	envs := []string{}
-	if s.InstallJava {
-		envs = append(envs,
-			fmt.Sprintf("Environment=JAVA_HOME=%s/jdk", s.DeployDir))
+	for k, v := range s.EnvironmentVars() {
+		envs = append(envs, fmt.Sprintf("Environment=%s=%s", k, v))
 	}
 
 	return strings.Join(envs, "\n")
@@ -121,16 +153,33 @@ func (s BeInstance) ConfigDir() string {
 	return filepath.Join(s.DeployDir, "conf")
 }
 
-func (s BeInstance) StarupScript() string {
+func (s BeInstance) PIDFile() string {
+	return filepath.Join(s.DeployDir, "bin", "be.pid")
+}
+
+func (s BeInstance) StartupScript() string {
 	return filepath.Join(s.DeployDir, "bin", "start_be.sh")
+}
+
+func (s BeInstance) StopScript() string {
+	return filepath.Join(s.DeployDir, "bin", "stop_be.sh")
+}
+
+func (s BeInstance) EnvironmentVars() map[string]string {
+	envs := make(map[string]string)
+	if s.InstallJava {
+		envs["JAVA_HOME"] = fmt.Sprintf("%s/jdk", s.DeployDir)
+	}
+
+	return envs
 }
 
 func (s BeInstance) SystemdEnvironment() string {
 	envs := []string{}
-	if s.InstallJava {
-		envs = append(envs,
-			fmt.Sprintf("Environment=JAVA_HOME=%s/jdk", s.DeployDir))
+	for k, v := range s.EnvironmentVars() {
+		envs = append(envs, fmt.Sprintf("Environment=%s=%s", k, v))
 	}
+
 	return strings.Join(envs, "\n")
 }
 

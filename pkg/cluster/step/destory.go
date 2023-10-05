@@ -14,13 +14,13 @@ func NewResetHost(ctx *task.Context) Step {
 		sshClient := ctx.SSHClients[fe.Host]
 		feInstance := topologyyaml.NewFeInstance(&ctx.TopoYaml, fe)
 		tasks = append(tasks,
-			remote.NewResetInstanceHost(sshClient, fe.DeployDir, feInstance.SystemdServicePath()))
+			remote.NewResetInstanceHost(sshClient, fe.DeployDir, ctx.TopoYaml.UseSystemd(), feInstance.SystemdServicePath()))
 	}
 	for _, be := range ctx.TopoYaml.BEs {
 		sshClient := ctx.SSHClients[be.Host]
 		beInstance := topologyyaml.NewBeInstance(&ctx.TopoYaml, be)
 		tasks = append(tasks,
-			remote.NewResetInstanceHost(sshClient, be.DeployDir, beInstance.SystemdServicePath()))
+			remote.NewResetInstanceHost(sshClient, be.DeployDir, ctx.TopoYaml.UseSystemd(), beInstance.SystemdServicePath()))
 	}
 
 	return NewParallel(tasks...)

@@ -26,9 +26,17 @@ type Topology struct {
 	BEs []BESpec `yaml:"bes"`
 }
 
+func (t *Topology) UseSystemd() bool {
+	if t.Global.UseSystemd == nil {
+		return true
+	}
+	return *t.Global.UseSystemd
+}
+
 type GlobalSpec struct {
 	DeployUser        string `yaml:"deploy_user"`
 	SSHPrivateKeyPath string `yaml:"ssh_private_key_path"`
+	UseSystemd        *bool  `yaml:"use_systemd"`
 }
 
 type FESpec struct {

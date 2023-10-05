@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User={{.DeployUser}}
 {{.SystemdEnvironment}}
-ExecStart={{.StarupScript}}
+ExecStart={{.StartupScript}}
 LimitNOFILE=65536 # used by doris_be
 
 Restart=always

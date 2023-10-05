@@ -20,7 +20,20 @@ func NewCheckHostsConfig(ctx *task.Context) Step {
 	tasks := make([]task.Task, 0, len(ctx.TopoYaml.BEs))
 	for _, be := range ctx.TopoYaml.BEs {
 		sshClient := ctx.SSHClients[be.Host]
-		tasks = append(tasks, remote.NewCheckMaxMapCount(sshClient))
+		if ctx.TopoYaml.UseSystemd() {
+			tasks = append(tasks,
+				NewSerial(
+					remote.NewCheckMaxMapCount(sshClient),
+					remote.NewCheckNoFile(sshClient),
+				),
+			)
+		} else {
+			tasks = append(tasks,
+				NewSerial(
+					remote.NewCheckMaxMapCount(sshClient),
+				),
+			)
+		}
 	}
 
 	return NewParallel(tasks...)
@@ -119,12 +132,12 @@ func NewInitConfig(ctx *task.Context) Step {
 
 	for _, fe := range ctx.TopoYaml.FEs {
 		sshClient := ctx.SSHClients[fe.Host]
-		tasks = append(tasks, remote.NewInitFeConfig(sshClient, topologyyaml.NewFeInstance(&ctx.TopoYaml, fe), fe.DeployDir))
+		tasks = append(tasks, remote.NewInitFeConfig(sshClient, topologyyaml.NewFeInstance(&ctx.TopoYaml, fe), fe.DeployDir, ctx.TopoYaml.UseSystemd()))
 	}
 
 	for _, be := range ctx.TopoYaml.BEs {
 		sshClient := ctx.SSHClients[be.Host]
-		tasks = append(tasks, remote.NewInitBeConfig(sshClient, topologyyaml.NewBeInstance(&ctx.TopoYaml, be), be.DeployDir))
+		tasks = append(tasks, remote.NewInitBeConfig(sshClient, topologyyaml.NewBeInstance(&ctx.TopoYaml, be), be.DeployDir, ctx.TopoYaml.UseSystemd()))
 	}
 
 	return NewParallel(tasks...)

@@ -14,13 +14,15 @@ var (
 type ResetInstanceHost struct {
 	sshClient          *ssh.SSHClient
 	deployDir          string
+	useSystemd         bool
 	SystemdServicePath string
 }
 
-func NewResetInstanceHost(sshClient *ssh.SSHClient, deployDir string, systemdServicePath string) *ResetInstanceHost {
+func NewResetInstanceHost(sshClient *ssh.SSHClient, deployDir string, useSystemd bool, systemdServicePath string) *ResetInstanceHost {
 	return &ResetInstanceHost{
 		sshClient:          sshClient,
 		deployDir:          deployDir,
+		useSystemd:         useSystemd,
 		SystemdServicePath: systemdServicePath,
 	}
 }
@@ -32,7 +34,10 @@ func (t *ResetInstanceHost) Name() string {
 func (t *ResetInstanceHost) Execute(ctx context.Context) error {
 	commands := []string{
 		"rm -rf " + t.deployDir,
-		"rm " + t.SystemdServicePath,
+	}
+
+	if t.useSystemd {
+		commands = append(commands, "rm -f "+t.SystemdServicePath)
 	}
 
 	return t.sshClient.Run(ctx, commands...)

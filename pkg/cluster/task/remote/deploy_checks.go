@@ -11,6 +11,7 @@ import (
 
 var (
 	_ task.Task = &CheckMaxMapCount{}
+	_ task.Task = &CheckNoFile{}
 )
 
 type CheckMaxMapCount struct {
@@ -48,7 +49,39 @@ func (t *CheckMaxMapCount) Execute(ctx context.Context) error {
 	}
 
 	if maxMapCount < 2000000 {
-		return fmt.Errorf("max_map_count=%d which is too small, please run 'sysctl -w vm.max_map_count=2000000'", maxMapCount)
+		return fmt.Errorf("max_map_count=%d on host %s is too small, please run 'sysctl -w vm.max_map_count=2000000'", maxMapCount, t.sshClient.RemoveAddr())
+	}
+
+	return nil
+}
+
+type CheckNoFile struct {
+	sshClient *ssh.SSHClient
+}
+
+func NewCheckNoFile(sshClient *ssh.SSHClient) *CheckNoFile {
+	return &CheckNoFile{
+		sshClient: sshClient,
+	}
+}
+
+func (t *CheckNoFile) Name() string {
+	return "check-no-file"
+}
+
+func (t *CheckNoFile) Execute(ctx context.Context) error {
+	noFileString, err := t.sshClient.Exec(ctx, "ulimit -n")
+	if err != nil {
+		return err
+	}
+
+	noFile, err := strconv.Atoi(noFileString)
+	if err != nil {
+		return err
+	}
+
+	if noFile < 65536 {
+		return fmt.Errorf("ulimit -n=%d on host %s is too small, please run 'ulimit -n 65536'", noFile, t.sshClient.RemoveAddr())
 	}
 
 	return nil
