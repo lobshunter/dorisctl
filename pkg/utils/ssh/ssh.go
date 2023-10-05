@@ -55,9 +55,14 @@ func (s *SSHClient) AuthorizedKey() string {
 	return string(ssh.MarshalAuthorizedKey(s.sshSigner.PublicKey()))
 }
 
-// Exec executes a command and returns stdout, stderr, exitCode and error
-func (s *SSHClient) Exec(ctx context.Context, cmd string) (stdout string, stderr string, exitCode int, err error) {
-	return s.exec(ctx, cmd)
+// Exec executes a command and returns stdout or not nil error
+func (s *SSHClient) Exec(ctx context.Context, cmd string) (string, error) {
+	stdout, stderr, exitCode, err := s.exec(ctx, cmd)
+	if err != nil || exitCode != 0 {
+		return "", fmt.Errorf("command %s exit %d stderr %s", cmd, exitCode, stderr)
+	}
+
+	return stdout, nil
 }
 
 // Run runs commands in sequence, if any command fails, it will return error

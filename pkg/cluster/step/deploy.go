@@ -16,6 +16,16 @@ func NewUniqueCluster(ctx *task.Context) Step {
 	return NewSerial(local.NewEnsureUniqueManifest(ctx.ManifestStore, ctx.ClusterName))
 }
 
+func NewCheckHostsConfig(ctx *task.Context) Step {
+	tasks := make([]task.Task, 0, len(ctx.TopoYaml.BEs))
+	for _, be := range ctx.TopoYaml.BEs {
+		sshClient := ctx.SSHClients[be.Host]
+		tasks = append(tasks, remote.NewCheckMaxMapCount(sshClient))
+	}
+
+	return NewParallel(tasks...)
+}
+
 func NewDownloadPackage(ctx *task.Context) Step {
 	pkgs := make(map[string]digest.Digest)
 	for _, be := range ctx.TopoYaml.BEs {

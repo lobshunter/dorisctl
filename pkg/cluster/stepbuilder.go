@@ -24,6 +24,7 @@ func GetDeployClusterSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
 		// TODO: maybe lock manifest before finish
 		step.NewStepDisplay("Ensure Unique Cluster ", step.NewUniqueCluster(ctx)),
+		step.NewStepDisplay("Check Hosts Config ", step.NewCheckHostsConfig(ctx)),
 		step.NewStepDisplay("Download Packages ", step.NewDownloadPackage(ctx)),
 		step.NewStepDisplay("Init Hosts ", step.NewInitHost(ctx)),
 		step.NewStepDisplay("Install Packages ", step.NewInstallPackage(ctx)),
