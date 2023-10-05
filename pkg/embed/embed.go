@@ -5,12 +5,10 @@ import (
 	"text/template"
 )
 
-//go:embed scripts systemd
+//go:embed systemd
 var embededFiles embed.FS
 
 const (
-	FeScriptPath       = "scripts/doris_fe.sh"
-	BeScriptPath       = "scripts/doris_be.sh"
 	SystemdServicePath = "systemd/component.service"
 )
 

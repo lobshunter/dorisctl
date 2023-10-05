@@ -1,5 +1,5 @@
 global:
-  deploy_user: doris
+  deploy_user: root
   ssh_private_key_path: ~/.ssh/id_rsa
 fes:
   - host: "127.0.0.1"

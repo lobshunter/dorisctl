@@ -1,9 +1,11 @@
 # global is some global config used by dorisctl
 global:
   # deploy doris as <deploy_user>, the doris processes will run as <deploy_user>
-  deploy_user: doris
+  # note that <deploy_user> should be created before running dorisctl
+  # also <deploy_user> should have root privilege(to write systemd files, etc.), it's recommended to use root
+  deploy_user: root
   # private key path used to connect to remote host
-  # ssh root@<host> -i <ssh_private_key_path> should work
+  # ssh <deploy_user>@<host> -i <ssh_private_key_path> should work
   ssh_private_key_path: ~/.ssh/id_rsa
 
 # doris fe specifications
@@ -22,6 +24,8 @@ fes:
       query_port = 9030
       edit_log_port = 9010
       priority_networks=127.0.0.1/24
+
+      JAVA_OPTS_FOR_JDK_9="-Xmx1024m"
     # doris fe metadata master, only one of fe should be master(set is_master to true)
     is_master: true
     # whether to install standalone java under <deploy_dir>/jdk

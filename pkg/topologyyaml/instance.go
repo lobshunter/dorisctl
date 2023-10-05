@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	_ "github.com/go-sql-driver/mysql" // register mysql
@@ -49,7 +50,7 @@ func (s FeInstance) GetDB(_ context.Context) (*sqlx.DB, error) {
 	return db, nil
 }
 
-// MasterHelper returns master_fe:master_editlog_port, used by fe startup script
+// MasterHelper returns master_fe:master_editlog_port(bdbje helper), used by fe startup script
 // See: https://doris.apache.org/docs/dev/admin-manual/maint-monitor/metadata-operation/
 func (s FeInstance) MasterHelper() string {
 	for _, fe := range s.Topo.FEs {
@@ -58,7 +59,7 @@ func (s FeInstance) MasterHelper() string {
 		}
 	}
 
-	// it's not supporsed to use first fe as default master fe
+	// use first fe as default master fe, but it's not supposed to so
 	return fmt.Sprintf("%s:%d", s.Topo.FEs[0].Host, s.Topo.FEs[0].FeConfig.EditLogPort)
 }
 
@@ -66,17 +67,23 @@ func (s FeInstance) ConfigDir() string {
 	return filepath.Join(s.DeployDir, "conf")
 }
 
-func (s FeInstance) StarupScript() (string, error) {
-	tpl, err := embed.ReadTemplate(embed.FeScriptPath)
-	if err != nil {
-		return "", err
+func (s FeInstance) StarupScript() string {
+	startupScript := filepath.Join(s.DeployDir, "bin", "start_fe.sh")
+	if !s.IsMaster {
+		startupScript = fmt.Sprintf("%s --helper %s", startupScript, s.MasterHelper())
 	}
 
-	return executeTemplate(tpl, s)
+	return startupScript
 }
 
-func (s FeInstance) StarupScriptPath() string {
-	return filepath.Join(s.DeployDir, "start_fe.sh")
+func (s FeInstance) SystemdEnvironment() string {
+	envs := []string{}
+	if s.InstallJava {
+		envs = append(envs,
+			fmt.Sprintf("Environment=JAVA_HOME=%s/jdk", s.DeployDir))
+	}
+
+	return strings.Join(envs, "\n")
 }
 
 func (s FeInstance) SystemdServiceContent() (string, error) {
@@ -114,17 +121,17 @@ func (s BeInstance) ConfigDir() string {
 	return filepath.Join(s.DeployDir, "conf")
 }
 
-func (s BeInstance) StarupScript() (string, error) {
-	tpl, err := embed.ReadTemplate(embed.BeScriptPath)
-	if err != nil {
-		return "", err
-	}
-
-	return executeTemplate(tpl, s)
+func (s BeInstance) StarupScript() string {
+	return filepath.Join(s.DeployDir, "bin", "start_be.sh")
 }
 
-func (s BeInstance) StarupScriptPath() string {
-	return filepath.Join(s.DeployDir, "start_be.sh")
+func (s BeInstance) SystemdEnvironment() string {
+	envs := []string{}
+	if s.InstallJava {
+		envs = append(envs,
+			fmt.Sprintf("Environment=JAVA_HOME=%s/jdk", s.DeployDir))
+	}
+	return strings.Join(envs, "\n")
 }
 
 func (s BeInstance) SystemdServiceContent() (string, error) {

@@ -44,14 +44,6 @@ func (t *InitFeConfig) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	startupScript, err := t.fe.StarupScript()
-	if err != nil {
-		return err
-	}
-	err = t.sshClient.WriteFile(bytes.NewBufferString(startupScript), t.fe.StarupScriptPath())
-	if err != nil {
-		return err
-	}
 	systemdUnit, err := t.fe.SystemdServiceContent()
 	if err != nil {
 		return err
@@ -94,14 +86,6 @@ func (t *InitBeConfig) Execute(_ context.Context) error {
 	}
 	err = t.sshClient.WriteFile(bytes.NewBufferString(t.be.Config),
 		filepath.Join(t.be.ConfigDir(), filenames.DorisBEConfFile))
-	if err != nil {
-		return err
-	}
-	startupScript, err := t.be.StarupScript()
-	if err != nil {
-		return err
-	}
-	err = t.sshClient.WriteFile(bytes.NewBufferString(startupScript), t.be.StarupScriptPath())
 	if err != nil {
 		return err
 	}

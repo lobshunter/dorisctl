@@ -4,7 +4,9 @@ After=network.target
 
 [Service]
 User={{.DeployUser}}
-ExecStart=/bin/bash '{{.StarupScriptPath}}'
+{{.SystemdEnvironment}}
+ExecStart={{.StarupScript}}
+LimitNOFILE=65536 # used by doris_be
 
 Restart=always
 RestartSec=15s
