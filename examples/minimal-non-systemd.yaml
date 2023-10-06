@@ -1,0 +1,42 @@
+global:
+  deploy_user: root
+  ssh_private_key_path: ~/.ssh/id_rsa
+  use_systemd: false
+fes:
+  - host: "127.0.0.1"
+    ssh_port: 22
+    deploy_dir: /doris/fe
+    config: |
+      http_port = 8030
+      rpc_port = 9020
+      query_port = 9030
+      edit_log_port = 9010
+      priority_networks=127.0.0.1/24
+    is_master: true
+    install_java: true
+    java_package_url: https://aka.ms/download-jdk/microsoft-jdk-11.0.20-linux-aarch64.tar.gz
+    java_digest: sha256:0aaf48d5bed9fd1bfd2bfaaa33007bee0dabccb8fb791ddd468f9b49839823ad
+    package_url: https://apache-doris-releases.oss-accelerate.aliyuncs.com/apache-doris-2.0-beta-bin-arm64.tar.gz
+    digest: sha512:6fd78585457e08f36c1cb05b4a9095a5fb41b0a2d7fd3a594bdff2c295ad66ec7ac641eaac7eacf6a1c091f912d448705404b226d5f757bf02c427f5c2d2bf31
+
+bes:
+  - host: "127.0.0.1"
+    ssh_port: 22
+    deploy_dir: /doris/be
+    config: |
+      be_port = 9060
+      webserver_port = 8040
+      heartbeat_service_port = 9050
+      brpc_port = 8060
+      priority_networks=127.0.0.1/24
+      storage_root_path=/doris/be/storage.SSD
+
+      disable_minidump = true
+      path_gc_check_interval_second=1
+      max_garbage_sweep_interval=180
+      enable_storage_vectorization=false
+    install_java: true
+    java_package_url: https://aka.ms/download-jdk/microsoft-jdk-11.0.20-linux-aarch64.tar.gz
+    java_digest: sha256:0aaf48d5bed9fd1bfd2bfaaa33007bee0dabccb8fb791ddd468f9b49839823ad
+    package_url: https://apache-doris-releases.oss-accelerate.aliyuncs.com/apache-doris-2.0-beta-bin-arm64.tar.gz
+    digest: sha512:6fd78585457e08f36c1cb05b4a9095a5fb41b0a2d7fd3a594bdff2c295ad66ec7ac641eaac7eacf6a1c091f912d448705404b226d5f757bf02c427f5c2d2bf31

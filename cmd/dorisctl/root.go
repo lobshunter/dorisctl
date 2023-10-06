@@ -9,13 +9,17 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newVersionCmd())
-	rootCmd.AddCommand(newDeplpyCmd())
-	rootCmd.AddCommand(newStartCmd())
-	rootCmd.AddCommand(newDestroyCmd())
-	rootCmd.AddCommand(newListCmd())
-	rootCmd.AddCommand(newStopCmd())
-	rootCmd.AddCommand(newStatusCmd())
+	rootCmd.AddCommand(
+		newVersionCmd(),
+		newDeplpyCmd(),
+		newStartCmd(),
+		newDestroyCmd(),
+		newListCmd(),
+		newStopCmd(),
+		newStatusCmd(),
+		newTakeOverCmd(),
+		newHandOverCmd(),
+	)
 }
 
 // WrapArgsError annotates cobra args error with some context, so the error message is more user-friendly

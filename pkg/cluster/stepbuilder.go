@@ -22,7 +22,7 @@ func RunSteps(ctx context.Context, steps ...step.Step) error {
 
 func GetDeployClusterSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
-		// TODO: maybe lock manifest before finish
+		// TODO: lock manifest before finish
 		step.NewStepDisplay("Ensure Unique Cluster ", step.NewUniqueCluster(ctx)),
 		step.NewStepDisplay("Check Hosts Config ", step.NewCheckHostsConfig(ctx)),
 		step.NewStepDisplay("Download Packages ", step.NewDownloadPackage(ctx)),
@@ -59,5 +59,20 @@ func GetDestroyClusterSteps(ctx *task.Context) []step.Step {
 func GetCheckClusterStatusSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
 		step.NewStepDisplay("Check Cluster Status ", step.NewCheckClusterStatus(ctx)),
+	}
+}
+
+func GetTakeOverClusterSteps(ctx *task.Context) []step.Step {
+	return []step.Step{
+		step.NewStepDisplay("Ensure Unique Cluster ", step.NewUniqueCluster(ctx)),
+		// FIXME: get fe master
+		step.NewStepDisplay("Complete Topology ", step.NewCompleteTopology(ctx)),
+		step.NewStepDisplay("Save Manifest ", step.NewSaveManifest(ctx)),
+	}
+}
+
+func GetHandOverClusterSteps(ctx *task.Context) []step.Step {
+	return []step.Step{
+		step.NewStepDisplay("Remove Manifest ", step.NewRemoveManifest(ctx)),
 	}
 }

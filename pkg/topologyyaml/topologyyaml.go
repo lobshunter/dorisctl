@@ -163,3 +163,49 @@ func Load(r io.Reader) (*Topology, error) {
 	}
 	return t, nil
 }
+
+type ManualDeployInfo struct {
+	DeployUser string
+	SSHPort    int
+	SSHKeyPath string
+
+	FeHosts     []string
+	BeHosts     []string
+	FeDeployDir string
+	BeDeployDir string
+}
+
+// BuildTopoFromManualDeploy transform deploy information into (incomplete) Topology struct
+// It then be used to complete and generate a topology yaml file
+func BuildTopoFromManualDeploy(deployInfo ManualDeployInfo) *Topology {
+	topo := &Topology{
+		Global: GlobalSpec{
+			DeployUser:        deployInfo.DeployUser,
+			SSHPrivateKeyPath: deployInfo.SSHKeyPath,
+		},
+		FEs: make([]FESpec, 0, len(deployInfo.FeHosts)),
+		BEs: make([]BESpec, 0, len(deployInfo.BeHosts)),
+	}
+
+	for _, host := range deployInfo.FeHosts {
+		topo.FEs = append(topo.FEs, FESpec{
+			ComponentSpec: ComponentSpec{
+				Host:      host,
+				SSHPort:   deployInfo.SSHPort,
+				DeployDir: deployInfo.FeDeployDir,
+			},
+		})
+	}
+
+	for _, host := range deployInfo.BeHosts {
+		topo.BEs = append(topo.BEs, BESpec{
+			ComponentSpec: ComponentSpec{
+				Host:      host,
+				SSHPort:   deployInfo.SSHPort,
+				DeployDir: deployInfo.BeDeployDir,
+			},
+		})
+	}
+
+	return topo
+}

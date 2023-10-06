@@ -62,6 +62,12 @@ func BuildContext(clusterName string, topo topologyyaml.Topology,
 	}, nil
 }
 
+// Warn: do not use this method unless it's REALLY needed.
+// It's only used in pkg/cluster/step/takeover.go at the time of writing.
+func (c *Context) SetTopoYaml(topo topologyyaml.Topology) {
+	c.TopoYaml = topo
+}
+
 func (c *Context) SetClusterStatus(status topologyyaml.ClusterStatus) {
 	// TODO: read/write lock
 	c.ClusterStatus = status
