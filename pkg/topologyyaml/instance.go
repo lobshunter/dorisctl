@@ -55,6 +55,7 @@ func (s FeInstance) CheckHealth(ctx context.Context) (bool, error) {
 	return err == nil, nil
 }
 
+// nolint: gocyclo
 func (s FeInstance) GetCluserStatus(ctx context.Context) (ClusterStatus, error) {
 	clusterStatus := ClusterStatus{}
 

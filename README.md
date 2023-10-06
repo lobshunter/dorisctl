@@ -52,7 +52,7 @@ $ dorisctl stop
 $ dorisctl destory
 
 # take over a manually deployed cluster so it can be managed by dorisctl
-$ dorisctl takeover --cluster-name yelo --fe-hosts 172.30.0.9 --be-hosts 172.30.0.5,172.30.0.6,172.30.0.12 --fe-deploy-dir /doris/fe  --be-deploy-dir /doris/be --fe-master 172.30.0.9
+$ dorisctl takeover --cluster-name yelo --fe-hosts 172.30.0.9,172.30.0.10 --fe-master 172.30.0.9 --be-hosts 172.30.0.5,172.30.0.6,172.30.0.12 --fe-deploy-dir /doris/fe  --be-deploy-dir /doris/be
 
 # handover managed cluster (remove manifest from dorisctl, without deleting the cluster)
 $ dorisctl handover --cluster-name yelo
