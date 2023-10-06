@@ -45,10 +45,10 @@ func newListCmd() *cobra.Command {
 func printClusterList(clusters map[string]*topologyyaml.Topology) {
 	w := tablewriter.NewWriter(os.Stdout)
 	w.SetAlignment(tablewriter.ALIGN_CENTER)
-	w.SetHeader([]string{"Cluster Name", "FeMaster", "Fe Quert Port"})
+	w.SetHeader([]string{"Cluster Name", "Fe Master", "Fe Quert Port"})
 
 	for name, topo := range clusters {
-		feMaster := topo.FEs[0].Host
+		feMaster := topo.FEs[0].Host + " (actual master unknown)"
 		feQueryPort := topo.FEs[0].FeConfig.QueryPort
 
 		for _, fe := range topo.FEs {

@@ -65,7 +65,6 @@ func GetCheckClusterStatusSteps(ctx *task.Context) []step.Step {
 func GetTakeOverClusterSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
 		step.NewStepDisplay("Ensure Unique Cluster ", step.NewUniqueCluster(ctx)),
-		// FIXME: get fe master
 		step.NewStepDisplay("Complete Topology ", step.NewCompleteTopology(ctx)),
 		step.NewStepDisplay("Save Manifest ", step.NewSaveManifest(ctx)),
 	}

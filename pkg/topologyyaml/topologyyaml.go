@@ -169,6 +169,7 @@ type ManualDeployInfo struct {
 	SSHPort    int
 	SSHKeyPath string
 
+	FeMaster    string
 	FeHosts     []string
 	BeHosts     []string
 	FeDeployDir string
@@ -191,6 +192,7 @@ func BuildTopoFromManualDeploy(deployInfo ManualDeployInfo) *Topology {
 
 	for _, host := range deployInfo.FeHosts {
 		topo.FEs = append(topo.FEs, FESpec{
+			IsMaster: host == deployInfo.FeMaster,
 			ComponentSpec: ComponentSpec{
 				Host:      host,
 				SSHPort:   deployInfo.SSHPort,

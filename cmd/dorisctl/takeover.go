@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slices"
 
 	"github.com/lobshunter/dorisctl/pkg/cluster"
 	"github.com/lobshunter/dorisctl/pkg/cluster/task"
@@ -18,6 +20,7 @@ func newTakeOverCmd() *cobra.Command {
 	var clusterName string
 
 	var (
+		feMaster    string
 		feHosts     string
 		feDeployDir string
 		beHosts     string
@@ -36,17 +39,22 @@ func newTakeOverCmd() *cobra.Command {
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)
 
-			topo := topologyyaml.BuildTopoFromManualDeploy(topologyyaml.ManualDeployInfo{
+			deployInfo := topologyyaml.ManualDeployInfo{
 				DeployUser: deployUser,
 				SSHKeyPath: sshKeyPath,
 				SSHPort:    sshPort,
 
+				FeMaster:    feMaster,
 				FeHosts:     strings.Split(feHosts, ","),
 				BeHosts:     strings.Split(beHosts, ","),
 				FeDeployDir: feDeployDir,
 				BeDeployDir: beDeployDir,
-			})
+			}
+			if !slices.Contains(deployInfo.FeHosts, deployInfo.FeMaster) {
+				return fmt.Errorf("fe master %s not in fe hosts %v", deployInfo.FeMaster, deployInfo.FeHosts)
+			}
 
+			topo := topologyyaml.BuildTopoFromManualDeploy(deployInfo)
 			taskCtx, err := task.BuildContext(clusterName, *topo, packageStore, manifestStore)
 			if err != nil {
 				return err
@@ -61,6 +69,8 @@ func newTakeOverCmd() *cobra.Command {
 	cmd.Flags().StringVar(&clusterName, "cluster-name", "tookover", "cluster name")
 
 	// TODO: maybe don't require hosts, but retrieve them via Fe query port(just need a running fe master)
+	cmd.Flags().StringVar(&feMaster, "fe-master", "", "--fe-master <host>")
+	_ = cmd.MarkFlagRequired("fe-master")
 	cmd.Flags().StringVar(&feHosts, "fe-hosts", "", "--fe-hosts <host1,host2,...>")
 	_ = cmd.MarkFlagRequired("fe-hosts")
 	cmd.Flags().StringVar(&beHosts, "be-hosts", "", "--be-hosts <host1,host2,...>")
