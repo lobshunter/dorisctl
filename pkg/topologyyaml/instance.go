@@ -79,6 +79,9 @@ func (s FeInstance) GetCluserStatus(ctx context.Context) (ClusterStatus, error) 
 			return clusterStatus, fmt.Errorf("failed to scan frontend status: %v", err)
 		}
 
+		if feStatus.Host == "" {
+			feStatus.Host = feStatus.IP // to compatible with doris v1.x ...
+		}
 		clusterStatus.Fes = append(clusterStatus.Fes, feStatus)
 	}
 
@@ -94,6 +97,9 @@ func (s FeInstance) GetCluserStatus(ctx context.Context) (ClusterStatus, error) 
 			return clusterStatus, fmt.Errorf("failed to scan backend status: %v", err)
 		}
 
+		if beStatus.Host == "" {
+			beStatus.Host = beStatus.IP // to compatible with doris v1.x ...
+		}
 		clusterStatus.Bes = append(clusterStatus.Bes, beStatus)
 	}
 

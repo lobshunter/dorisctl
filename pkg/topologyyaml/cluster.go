@@ -8,6 +8,7 @@ type ClusterStatus struct {
 
 type FeStatus struct {
 	Host      string `db:"Host"`
+	IP        string `db:"IP"` // doris v1.x use IP, v2.x use Host
 	IsMaster  bool   `db:"IsMaster"`
 	QueryPort int    `db:"QueryPort"`
 	Alive     bool   `db:"Alive"`
@@ -16,6 +17,7 @@ type FeStatus struct {
 
 type BeStatus struct {
 	Host          string `db:"Host"`
+	IP            string `db:"IP"` // doris v1.x use IP, v2.x use Host
 	Alive         bool   `db:"Alive"`
 	AvailCapacity string `db:"AvailCapacity"`
 	TotalCapacity string `db:"TotalCapacity"`
