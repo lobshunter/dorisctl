@@ -10,6 +10,7 @@ type FeStatus struct {
 	Host      string `db:"Host"`
 	IP        string `db:"IP"` // doris v1.x use IP, v2.x use Host
 	IsMaster  bool   `db:"IsMaster"`
+	IsHelper  bool   `db:"IsHelper"` // starrocks use "IsHelper"
 	QueryPort int    `db:"QueryPort"`
 	Alive     bool   `db:"Alive"`
 	Version   string `db:"Version"`

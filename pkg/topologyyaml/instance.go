@@ -82,6 +82,7 @@ func (s FeInstance) GetCluserStatus(ctx context.Context) (ClusterStatus, error) 
 		if feStatus.Host == "" {
 			feStatus.Host = feStatus.IP // to compatible with doris v1.x ...
 		}
+		feStatus.IsMaster = feStatus.IsMaster || feStatus.IsHelper
 		clusterStatus.Fes = append(clusterStatus.Fes, feStatus)
 	}
 
