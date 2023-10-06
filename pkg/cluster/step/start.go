@@ -1,11 +1,12 @@
 package step
 
 import (
+	"golang.org/x/exp/slices"
+
 	"github.com/lobshunter/dorisctl/pkg/cluster/task"
 	"github.com/lobshunter/dorisctl/pkg/cluster/task/doris"
 	"github.com/lobshunter/dorisctl/pkg/cluster/task/remote"
 	"github.com/lobshunter/dorisctl/pkg/topologyyaml"
-	"golang.org/x/exp/slices"
 )
 
 func NewStartCluster(ctx *task.Context) Step {
@@ -37,6 +38,17 @@ func NewAddBes(ctx *task.Context) Step {
 		doris.NewCheckDorisClusterStatus(ctx, feMaster),
 		doris.NewAddBes(ctx, feMaster, ctx.TopoYaml.BEs),
 	)
+}
+
+func NewWaitClusterHealthy(ctx *task.Context) Step {
+	feMasterIdx := slices.IndexFunc(ctx.TopoYaml.FEs, func(fe topologyyaml.FESpec) bool {
+		return fe.IsMaster
+	})
+	feMaster := topologyyaml.NewFeInstance(&ctx.TopoYaml, ctx.TopoYaml.FEs[feMasterIdx])
+
+	task := doris.NewWaitClusterHealthy(feMaster)
+
+	return NewSerial(task)
 }
 
 func NewCheckClusterStatus(ctx *task.Context) Step {

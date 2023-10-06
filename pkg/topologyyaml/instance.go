@@ -55,6 +55,72 @@ func (s FeInstance) CheckHealth(ctx context.Context) (bool, error) {
 	return err == nil, nil
 }
 
+func (s FeInstance) GetCluserStatus(ctx context.Context) (ClusterStatus, error) {
+	clusterStatus := ClusterStatus{}
+
+	db, err := s.GetDB(ctx)
+	if err != nil {
+		return clusterStatus, err
+	}
+	db = db.Unsafe()
+	defer db.Close()
+
+	clusterStatus.FeMasterHealthy = true
+	// show frontends
+	feRows, err := db.QueryxContext(ctx, "show frontends")
+	if err != nil {
+		return clusterStatus, fmt.Errorf("failed to query frontends: %v", err)
+	}
+	defer feRows.Close()
+	for feRows.Next() {
+		feStatus := FeStatus{}
+		err = feRows.StructScan(&feStatus)
+		if err != nil {
+			return clusterStatus, fmt.Errorf("failed to scan frontend status: %v", err)
+		}
+
+		clusterStatus.Fes = append(clusterStatus.Fes, feStatus)
+	}
+
+	beRows, err := db.QueryxContext(ctx, "show backends")
+	if err != nil {
+		return clusterStatus, fmt.Errorf("failed to query backends: %v", err)
+	}
+	defer beRows.Close()
+	for beRows.Next() {
+		beStatus := BeStatus{}
+		err = beRows.StructScan(&beStatus)
+		if err != nil {
+			return clusterStatus, fmt.Errorf("failed to scan backend status: %v", err)
+		}
+
+		clusterStatus.Bes = append(clusterStatus.Bes, beStatus)
+	}
+
+	return clusterStatus, nil
+}
+
+func (s FeInstance) CheckClusterHealth(ctx context.Context) (bool, error) {
+	clusterStatus, err := s.GetCluserStatus(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	for _, fe := range clusterStatus.Fes {
+		if !fe.Alive {
+			return false, nil
+		}
+	}
+
+	for _, be := range clusterStatus.Bes {
+		if !be.Alive {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
 func (s FeInstance) GetDB(_ context.Context) (*sqlx.DB, error) {
 	// TODO: support username/password
 	db, err := sqlx.Open("mysql",

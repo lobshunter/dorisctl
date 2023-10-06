@@ -37,6 +37,7 @@ func GetStartClusterSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
 		step.NewStepDisplay("Start Cluster ", step.NewStartCluster(ctx)),
 		step.NewStepDisplay("Add Bes ", step.NewAddBes(ctx)),
+		step.NewStepDisplay("Wait Cluster Healthy", step.NewWaitClusterHealthy(ctx)),
 	}
 }
 
