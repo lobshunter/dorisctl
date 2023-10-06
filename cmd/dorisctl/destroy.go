@@ -11,12 +11,20 @@ import (
 
 func newDestroyCmd() *cobra.Command {
 	var clusterName string
+	var yes bool
 	cmd := cobra.Command{
 		Use:          "destroy",
 		Short:        "Destroy a Doris cluster",
 		Args:         WrapArgsError(cobra.NoArgs),
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !yes {
+				sure := askForConfirmation("Are you sure you want to destroy the cluster? (y/n) ")
+				if !sure {
+					return nil
+				}
+			}
+
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)
 			topo, err := manifestStore.Get(clusterName)
@@ -36,6 +44,7 @@ func newDestroyCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&clusterName, "cluster-name", "default", "cluster name")
+	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation")
 
 	return &cmd
 }
