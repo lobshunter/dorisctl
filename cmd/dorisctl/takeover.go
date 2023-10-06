@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -69,7 +71,9 @@ func newTakeOverCmd() *cobra.Command {
 	_ = cmd.MarkFlagRequired("be-deploy-dir")
 	cmd.Flags().StringVar(&deployUser, "deploy-user", "root", "--deploy-user <user>")
 	cmd.Flags().IntVar(&sshPort, "ssh-port", 22, "--ssh-port <port>")
-	cmd.Flags().StringVar(&sshKeyPath, "ssh-key-path", "", "--ssh-key-path <path>")
+
+	home, _ := os.UserHomeDir()
+	cmd.Flags().StringVar(&sshKeyPath, "ssh-key-path", filepath.Join(home, ".ssh/id_rsa"), "--ssh-key-path <path>")
 
 	return &cmd
 }

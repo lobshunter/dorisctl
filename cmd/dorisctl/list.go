@@ -46,14 +46,20 @@ func printClusterList(clusters map[string]*topologyyaml.Topology) {
 	w := tablewriter.NewWriter(os.Stdout)
 	w.SetAlignment(tablewriter.ALIGN_CENTER)
 	w.SetHeader([]string{"Cluster Name", "FeMaster", "Fe Quert Port"})
-	for name, topo := range clusters {
-		for _, fe := range topo.FEs {
-			if !fe.IsMaster {
-				continue
-			}
 
-			w.Append([]string{name, fe.Host, fmt.Sprintf("%d", fe.FeConfig.QueryPort)})
+	for name, topo := range clusters {
+		feMaster := topo.FEs[0].Host
+		feQueryPort := topo.FEs[0].FeConfig.QueryPort
+
+		for _, fe := range topo.FEs {
+			if fe.IsMaster {
+				feMaster = fe.Host
+				feQueryPort = fe.FeConfig.QueryPort
+				break
+			}
 		}
+
+		w.Append([]string{name, feMaster, fmt.Sprintf("%d", feQueryPort)})
 	}
 	w.Render()
 }

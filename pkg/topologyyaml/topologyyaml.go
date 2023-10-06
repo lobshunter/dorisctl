@@ -178,10 +178,12 @@ type ManualDeployInfo struct {
 // BuildTopoFromManualDeploy transform deploy information into (incomplete) Topology struct
 // It then be used to complete and generate a topology yaml file
 func BuildTopoFromManualDeploy(deployInfo ManualDeployInfo) *Topology {
+	useSystemd := false
 	topo := &Topology{
 		Global: GlobalSpec{
 			DeployUser:        deployInfo.DeployUser,
 			SSHPrivateKeyPath: deployInfo.SSHKeyPath,
+			UseSystemd:        &useSystemd,
 		},
 		FEs: make([]FESpec, 0, len(deployInfo.FeHosts)),
 		BEs: make([]BESpec, 0, len(deployInfo.BeHosts)),
