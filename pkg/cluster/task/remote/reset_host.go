@@ -2,8 +2,10 @@ package remote
 
 import (
 	"context"
+	"strings"
 
 	"github.com/lobshunter/dorisctl/pkg/cluster/task"
+	"github.com/lobshunter/dorisctl/pkg/topologyyaml"
 	"github.com/lobshunter/dorisctl/pkg/utils/ssh"
 )
 
@@ -38,6 +40,31 @@ func (t *ResetInstanceHost) Execute(ctx context.Context) error {
 
 	if t.useSystemd {
 		commands = append(commands, "rm -f "+t.SystemdServicePath)
+	}
+
+	return t.sshClient.Run(ctx, commands...)
+}
+
+type ResetBeHost struct {
+	sshClient  *ssh.SSHClient
+	beInstance topologyyaml.BeInstance
+}
+
+func NewResetBeHost(sshClient *ssh.SSHClient, beInstance topologyyaml.BeInstance) *ResetBeHost {
+	return &ResetBeHost{
+		sshClient:  sshClient,
+		beInstance: beInstance,
+	}
+}
+
+func (t *ResetBeHost) Name() string {
+	return "reset-be-host"
+}
+
+func (t *ResetBeHost) Execute(ctx context.Context) error {
+	storageRootPaths := strings.Split(t.beInstance.BeConfig.StorageRootPath, ";")
+	commands := []string{
+		"rm -rf " + strings.Join(storageRootPaths, " "),
 	}
 
 	return t.sshClient.Run(ctx, commands...)

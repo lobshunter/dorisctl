@@ -20,7 +20,11 @@ func NewResetHost(ctx *task.Context) Step {
 		sshClient := ctx.SSHClients[be.Host]
 		beInstance := topologyyaml.NewBeInstance(&ctx.TopoYaml, be)
 		tasks = append(tasks,
-			remote.NewResetInstanceHost(sshClient, be.DeployDir, ctx.TopoYaml.UseSystemd(), beInstance.SystemdServicePath()))
+			NewSerial(
+				remote.NewResetInstanceHost(sshClient, be.DeployDir, ctx.TopoYaml.UseSystemd(), beInstance.SystemdServicePath()),
+				remote.NewResetBeHost(sshClient, beInstance),
+			),
+		)
 	}
 
 	return NewParallel(tasks...)
