@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slices"
 
 	"github.com/lobshunter/dorisctl/pkg/config"
+	"github.com/lobshunter/dorisctl/pkg/store"
 )
 
 func init() {
@@ -74,4 +76,17 @@ func askForConfirmation(s string) bool {
 			return false
 		}
 	}
+}
+
+func completeClusterName(_ *cobra.Command, _ []string, clusterNamePrefix string) ([]string, cobra.ShellCompDirective) {
+	clusters, err := store.NewLocalManifestStore(config.GlobalConfig.DataDir).List()
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	qualifiedClusters := slices.DeleteFunc(clusters, func(i string) bool {
+		return !strings.HasPrefix(i, clusterNamePrefix)
+	})
+
+	return qualifiedClusters, cobra.ShellCompDirectiveNoFileComp
 }

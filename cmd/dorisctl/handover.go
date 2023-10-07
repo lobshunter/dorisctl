@@ -44,6 +44,7 @@ func newHandOverCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&clusterName, "cluster-name", "tookover", "cluster name")
+	_ = cmd.RegisterFlagCompletionFunc("cluster-name", completeClusterName)
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation")
 
 	return &cmd

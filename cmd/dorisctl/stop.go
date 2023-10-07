@@ -36,6 +36,7 @@ func newStopCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&clusterName, "cluster-name", "default", "cluster name")
+	_ = cmd.RegisterFlagCompletionFunc("cluster-name", completeClusterName)
 
 	return &cmd
 }
