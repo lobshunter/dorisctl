@@ -19,7 +19,7 @@ LDFLAGS += -X "$(REPO)/pkg/version.buildDate=$(BUILD_DATE)"
 default: lint build
 
 build:
-	$(GO) build -ldflags '$(LDFLAGS)' -o bin/dorisctl-${GOOS}-${GOARCH} ./cmd/dorisctl
+	$(GO) build -trimpath -ldflags '$(LDFLAGS)' -o bin/dorisctl-${GOOS}-${GOARCH} ./cmd/dorisctl
 
 lint:
 	golangci-lint run
