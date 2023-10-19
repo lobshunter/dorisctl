@@ -14,10 +14,11 @@ import (
 
 func newListCmd() *cobra.Command {
 	cmd := cobra.Command{
-		Use:          "list",
-		Short:        "List all Doris clusters",
-		Args:         WrapArgsError(cobra.NoArgs),
-		SilenceUsage: true,
+		Use:               "list",
+		Short:             "List all Doris clusters",
+		Args:              WrapArgsError(cobra.NoArgs),
+		ValidArgsFunction: cobra.NoFileCompletions,
+		SilenceUsage:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)
 			clusters, err := manifestStore.List()

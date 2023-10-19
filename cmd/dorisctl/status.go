@@ -17,10 +17,11 @@ import (
 func newStatusCmd() *cobra.Command {
 	var clusterName string
 	cmd := cobra.Command{
-		Use:          "status",
-		Short:        "Check status of a Doris cluster",
-		Args:         WrapArgsError(cobra.NoArgs),
-		SilenceUsage: true,
+		Use:               "status",
+		Short:             "Check status of a Doris cluster",
+		Args:              WrapArgsError(cobra.NoArgs),
+		ValidArgsFunction: cobra.NoFileCompletions,
+		SilenceUsage:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)

@@ -12,11 +12,12 @@ func newHandOverCmd() *cobra.Command {
 	var clusterName string
 	var yes bool
 	cmd := cobra.Command{
-		Use:          "handover",
-		Short:        "Hand over a managed Doris cluster",
-		Long:         "Hand over a managed Doris cluster, stop dorisctl from managing it (i.e. remove manifest from dorisctl, but not delete the cluster)",
-		Args:         WrapArgsError(cobra.NoArgs),
-		SilenceUsage: true,
+		Use:               "handover",
+		Short:             "Hand over a managed Doris cluster",
+		Long:              "Hand over a managed Doris cluster, stop dorisctl from managing it (i.e. remove manifest from dorisctl, but not delete the cluster)",
+		Args:              WrapArgsError(cobra.NoArgs),
+		ValidArgsFunction: cobra.NoFileCompletions,
+		SilenceUsage:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !yes {
 				sure := askForConfirmation("Are you sure you want to hand over the cluster? (y/n) ")

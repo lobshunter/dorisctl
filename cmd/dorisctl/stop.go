@@ -12,10 +12,11 @@ import (
 func newStopCmd() *cobra.Command {
 	var clusterName string
 	cmd := cobra.Command{
-		Use:          "stop",
-		Short:        "Stop a Doris cluster",
-		Args:         WrapArgsError(cobra.NoArgs),
-		SilenceUsage: true,
+		Use:               "stop",
+		Short:             "Stop a Doris cluster",
+		Args:              WrapArgsError(cobra.NoArgs),
+		ValidArgsFunction: cobra.NoFileCompletions,
+		SilenceUsage:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)
