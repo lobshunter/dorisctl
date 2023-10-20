@@ -35,6 +35,7 @@ func newTakeOverCmd() *cobra.Command {
 		Use:               "takeover",
 		Short:             "Take over a manually deployed(non-systemd) Doris cluster, and make it managed by dorisctl",
 		Args:              WrapArgsError(cobra.NoArgs),
+		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
