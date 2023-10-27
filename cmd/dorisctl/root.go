@@ -24,6 +24,7 @@ func init() {
 		newStatusCmd(),
 		newTakeOverCmd(),
 		newHandOverCmd(),
+		newExecCmd(),
 
 		newSelfCmd(),
 		newVersionCmd(),

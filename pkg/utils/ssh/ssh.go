@@ -57,7 +57,7 @@ func (s *SSHClient) AuthorizedKey() string {
 
 // Exec executes a command and returns stdout or not nil error
 func (s *SSHClient) Exec(ctx context.Context, cmd string) (string, error) {
-	stdout, stderr, exitCode, err := s.exec(ctx, cmd)
+	stdout, stderr, exitCode, err := s.ExecVerbose(ctx, cmd)
 	if err != nil || exitCode != 0 {
 		return "", fmt.Errorf("command %s exit %d stderr %s", cmd, exitCode, stderr)
 	}
@@ -68,7 +68,7 @@ func (s *SSHClient) Exec(ctx context.Context, cmd string) (string, error) {
 // Run runs commands in sequence, if any command fails, it will return error
 func (s *SSHClient) Run(ctx context.Context, cmds ...string) error {
 	for _, cmd := range cmds {
-		stdout, stderr, exitCode, err := s.exec(ctx, cmd)
+		stdout, stderr, exitCode, err := s.ExecVerbose(ctx, cmd)
 		if err != nil {
 			return fmt.Errorf("command %s error: %w", cmd, err)
 		}
@@ -80,7 +80,8 @@ func (s *SSHClient) Run(ctx context.Context, cmds ...string) error {
 	return nil
 }
 
-func (s *SSHClient) exec(_ context.Context, cmd string) (stdout string, stderr string, exitCode int, err error) {
+// ExecVerbose executes a command and returns stdout, stderr, exitCode or not nil error
+func (s *SSHClient) ExecVerbose(_ context.Context, cmd string) (stdout string, stderr string, exitCode int, err error) {
 	sshConn, err := s.newConn()
 	if err != nil {
 		return "", "", -1, err

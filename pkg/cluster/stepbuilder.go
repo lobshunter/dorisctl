@@ -6,6 +6,7 @@ import (
 
 	"github.com/lobshunter/dorisctl/pkg/cluster/step"
 	"github.com/lobshunter/dorisctl/pkg/cluster/task"
+	"github.com/lobshunter/dorisctl/pkg/topologyyaml"
 )
 
 func RunSteps(ctx context.Context, steps ...step.Step) error {
@@ -73,5 +74,11 @@ func GetTakeOverClusterSteps(ctx *task.Context) []step.Step {
 func GetHandOverClusterSteps(ctx *task.Context) []step.Step {
 	return []step.Step{
 		step.NewStepDisplay("Remove Manifest ", step.NewRemoveManifest(ctx)),
+	}
+}
+
+func GetExecSteps(ctx *task.Context, hosts map[string]*topologyyaml.ExecOutput, command string) []step.Step {
+	return []step.Step{
+		step.NewStepDisplay("Execute Command ", step.NewExecCmd(ctx, hosts, command)),
 	}
 }
