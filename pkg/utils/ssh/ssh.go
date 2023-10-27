@@ -68,12 +68,12 @@ func (s *SSHClient) Exec(ctx context.Context, cmd string) (string, error) {
 // Run runs commands in sequence, if any command fails, it will return error
 func (s *SSHClient) Run(ctx context.Context, cmds ...string) error {
 	for _, cmd := range cmds {
-		_, stderr, exitCode, err := s.exec(ctx, cmd)
+		stdout, stderr, exitCode, err := s.exec(ctx, cmd)
 		if err != nil {
 			return fmt.Errorf("command %s error: %w", cmd, err)
 		}
 		if exitCode != 0 {
-			return fmt.Errorf("command %s exit %d stderr %s", cmd, exitCode, stderr)
+			return fmt.Errorf("command %s exit %d, stdout %s, stderr %s", cmd, exitCode, stdout, stderr)
 		}
 	}
 

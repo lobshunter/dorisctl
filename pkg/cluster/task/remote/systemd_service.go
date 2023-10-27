@@ -47,9 +47,8 @@ func (t *StartService) Execute(ctx context.Context) error {
 		}
 
 		commands = []string{
-			// TODO: do not hard code --daemon here, doesn't make sense
 			// kill -0 checks if the process is running
-			fmt.Sprintf("kill -0 $(cat $%s) || %s %s --daemon", t.instance.PIDFile(), envString, t.instance.StartupScript()),
+			fmt.Sprintf("kill -0 $(cat %s) 2>/dev/null || %s %s --daemon", t.instance.PIDFile(), envString, t.instance.StartupScript()),
 		}
 	}
 
@@ -83,7 +82,7 @@ func (t *StopService) Execute(ctx context.Context) error {
 		}
 	} else {
 		commands = []string{
-			t.instance.StopScript(),
+			fmt.Sprintf("kill -0 $(cat %s) 2>/dev/null && %s || true", t.instance.PIDFile(), t.instance.StopScript()),
 		}
 	}
 
