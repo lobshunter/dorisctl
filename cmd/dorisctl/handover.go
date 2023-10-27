@@ -9,14 +9,13 @@ import (
 )
 
 func newHandOverCmd() *cobra.Command {
-	var clusterName string
 	var yes bool
 	cmd := cobra.Command{
 		Use:               "handover",
 		Short:             "Hand over a managed Doris cluster",
 		Long:              "Hand over a managed Doris cluster, stop dorisctl from managing it (i.e. remove manifest from dorisctl, but not delete the cluster)",
-		Args:              WrapArgsError(cobra.NoArgs),
-		ValidArgsFunction: cobra.NoFileCompletions,
+		Args:              WrapArgsError(cobra.ExactArgs(1)),
+		ValidArgsFunction: completeClusterName,
 		SilenceUsage:      true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !yes {
@@ -26,6 +25,7 @@ func newHandOverCmd() *cobra.Command {
 				}
 			}
 
+			clusterName := args[0]
 			packageStore := store.NewPackageStore(config.GlobalConfig.CacheDir)
 			manifestStore := store.NewLocalManifestStore(config.GlobalConfig.DataDir)
 			topo, err := manifestStore.Get(clusterName)
@@ -44,8 +44,6 @@ func newHandOverCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&clusterName, "cluster-name", "tookover", "cluster name")
-	_ = cmd.RegisterFlagCompletionFunc("cluster-name", completeClusterName)
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation")
 
 	return &cmd
