@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/lobshunter/dorisctl/pkg/cluster/task"
 	"github.com/lobshunter/dorisctl/pkg/topologyyaml"
@@ -40,6 +41,7 @@ func (t *GetRunningFeConfig) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	output = trimTrailSpaces(output)
 
 	*t.output = output
 	return nil
@@ -70,7 +72,20 @@ func (t *GetRunningBeConfig) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	output = trimTrailSpaces(output)
 
 	*t.output = output
 	return nil
+}
+
+// trimTrailSpaces trims spaces at the end of each line.
+// it's essential for "gopkg.in/yaml.v3".Marshal to marshal multiline string to human readable format.
+// see: https://github.com/go-yaml/yaml/blob/496545a6307b2a7d7a710fd516e5e16e8ab62dbc/emitterc.go#L1392-L1394
+func trimTrailSpaces(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimRight(line, " ")
+	}
+
+	return strings.Join(lines, "\n")
 }
