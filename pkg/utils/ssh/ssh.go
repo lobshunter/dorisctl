@@ -93,7 +93,7 @@ func (s *SSHClient) exec(_ context.Context, cmd string) (stdout string, stderr s
 	stdoutBuf := bytes.NewBuffer(nil)
 	stderrBuf := bytes.NewBuffer(nil)
 	sess.Stdout, sess.Stderr = stdoutBuf, stderrBuf
-	cmd = fmt.Sprintf(`sh -c "%s"`, cmd)
+	cmd = fmt.Sprintf(`sh --login -c "%s"`, cmd)
 	err = sess.Start(cmd)
 	if err != nil {
 		return "", "", -1, err
