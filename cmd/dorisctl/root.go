@@ -16,7 +16,6 @@ import (
 
 func init() {
 	rootCmd.AddCommand(
-		newVersionCmd(),
 		newDeplpyCmd(),
 		newStartCmd(),
 		newDestroyCmd(),
@@ -25,6 +24,9 @@ func init() {
 		newStatusCmd(),
 		newTakeOverCmd(),
 		newHandOverCmd(),
+
+		newSelfCmd(),
+		newVersionCmd(),
 	)
 }
 
